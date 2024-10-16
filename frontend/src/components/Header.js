@@ -4,11 +4,8 @@ import { AppBar, Toolbar, Typography, Button, IconButton, Box, useTheme } from '
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import SettingsIcon from '@mui/icons-material/Settings';
 import ExtensionIcon from '@mui/icons-material/Extension';
-import MenuIcon from '@mui/icons-material/Menu';
 import { Link, useLocation } from 'react-router-dom';
-import Brightness4Icon from '@mui/icons-material/Brightness4';
-import Brightness7Icon from '@mui/icons-material/Brightness7';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+
 
 const StyledToolbar = styled(Toolbar)(({ theme, showSidebar, sidebarOpen }) => ({
   display: 'flex',

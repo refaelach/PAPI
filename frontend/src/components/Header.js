@@ -44,15 +44,50 @@ const Header = ({ showSidebar, sidebarOpen, drawerWidth }) => {
   const location = useLocation();
 
   return (
-    <header style={{backgroundColor: '#f0f0f0', padding: '1rem'}}>
-      <h1>Welcome to PAPI</h1>
-      <nav>
-        <ul style={{listStyle: 'none', padding: 0}}>
-          <li style={{display: 'inline', marginRight: '1rem'}}><a href="/">Home</a></li>
-          <li style={{display: 'inline', marginRight: '1rem'}}><a href="/about">About</a></li>
-        </ul>
-      </nav>
-    </header>
+    <AppBar 
+      position="static" 
+      elevation={0}
+      sx={{
+        width: showSidebar ? `calc(100% - ${sidebarOpen ? drawerWidth : theme => theme.spacing(7)}px)` : '100%',
+        marginLeft: showSidebar ? (sidebarOpen ? `${drawerWidth}px` : theme => theme.spacing(7)) : 0,
+        transition: theme => theme.transitions.create(['width', 'margin'], {
+          easing: theme.transitions.easing.sharp,
+          duration: theme.transitions.duration.enteringScreen,
+        }),
+      }}
+    >
+      <StyledToolbar>
+        <LogoContainer>
+          <Typography variant="h6" component={Link} to="/" sx={{ textDecoration: 'none', color: 'inherit' }}>
+            PAPI
+          </Typography>
+        </LogoContainer>
+        <MenuContainer>
+          {['dashboard', 'attack-surface', 'risk-posture', 'rt-protection'].map((item) => (
+            <StyledButton
+              key={item}
+              color="inherit"
+              component={Link}
+              to={`/${item}`}
+              active={location.pathname === `/${item}` ? 'true' : 'false'}
+            >
+              {item.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+            </StyledButton>
+          ))}
+        </MenuContainer>
+        <IconsContainer>
+          <IconButton color="inherit" component={Link} to="/settings">
+            <SettingsIcon />
+          </IconButton>
+          <IconButton color="inherit" component={Link} to="/integrations">
+            <ExtensionIcon />
+          </IconButton>
+          <IconButton color="inherit" component={Link} to="/profile">
+            <AccountCircle />
+          </IconButton>
+        </IconsContainer>
+      </StyledToolbar>
+    </AppBar>
   );
 };
 

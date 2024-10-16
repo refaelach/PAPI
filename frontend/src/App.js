@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import theme from './theme/theme';
+import getTheme from './theme/theme';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import AttackSurface from './pages/AttackSurface';
@@ -14,13 +14,32 @@ import Integrations from './pages/Integrations';
 import Login from './pages/Login';
 
 function App() {
+  const [mode, setMode] = useState('light');
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  const theme = useMemo(() => getTheme(mode), [mode]);
+
+  const toggleTheme = () => {
+    setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
+  };
+
+  const toggleSidebar = () => {
+    console.log('Toggling sidebar. Current state:', sidebarOpen);
+    setSidebarOpen(prevState => !prevState);
+  };
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route path="/" element={<Layout />}>
+          <Route path="/" element={<Layout 
+            sidebarOpen={sidebarOpen} 
+            toggleSidebar={toggleSidebar}
+            toggleTheme={toggleTheme}
+            mode={mode}
+          />}>
             <Route index element={<Navigate to="/dashboard" replace />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="attack-surface" element={<AttackSurface />}>

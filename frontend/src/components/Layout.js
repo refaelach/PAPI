@@ -1,49 +1,51 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
-import { Box, IconButton, Typography } from '@mui/material';
-import MenuIcon from '@mui/icons-material/Menu';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import { Box, useTheme } from '@mui/material';
 import Header from './Header';
 import SidePanel from './SidePanel';
+import { Toolbar } from '@mui/material';
 
-const DRAWER_WIDTH = 240; // Define the width of the side panel
+const DRAWER_WIDTH = 240;
+const COLLAPSED_DRAWER_WIDTH = 64; // Width of the collapsed sidebar
 
-const Layout = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+const Layout = ({ sidebarOpen, toggleSidebar, toggleTheme, mode }) => {
   const location = useLocation();
+  const theme = useTheme();
 
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
-
-  const showSidebar = location.pathname !== '/dashboard';
+  const showSidebar = !['/', '/dashboard'].includes(location.pathname);
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+    <Box sx={{ 
+      display: 'flex',
+      minHeight: '100vh',
+      backgroundColor: theme.palette.background.default,
+      backgroundImage: `linear-gradient(to bottom right, ${theme.palette.background.default}, ${theme.palette.background.paper})`,
+    }}>
       <Header 
         showSidebar={showSidebar} 
-        sidebarOpen={sidebarOpen} 
-        drawerWidth={DRAWER_WIDTH}
+        sidebarOpen={sidebarOpen}
+        toggleSidebar={toggleSidebar}
+        toggleTheme={toggleTheme}
+        mode={mode}
       />
-      <Box sx={{ display: 'flex', flexGrow: 1, overflow: 'hidden' }}>
-        {showSidebar && (
-          <SidePanel open={sidebarOpen} toggleDrawer={toggleSidebar} />
-        )}
-        <Box 
-          component="main" 
-          sx={{ 
-            flexGrow: 1, 
-            p: 3, 
-            overflow: 'auto',
-            marginLeft: showSidebar ? (sidebarOpen ? `${DRAWER_WIDTH}px` : theme => theme.spacing(7)) : 0,
-            transition: theme => theme.transitions.create('margin', {
-              easing: theme.transitions.easing.sharp,
-              duration: theme.transitions.duration.enteringScreen,
-            }),
-          }}
-        >
-          <Outlet />
-        </Box>
+      {showSidebar && (
+        <SidePanel open={sidebarOpen} toggleDrawer={toggleSidebar} />
+      )}
+      <Box 
+        component="main" 
+        sx={{ 
+          flexGrow: 1, 
+          p: 3, 
+          width: '100%',
+          marginLeft: showSidebar ? (sidebarOpen ? `${DRAWER_WIDTH}px` : `${COLLAPSED_DRAWER_WIDTH}px`) : 0,
+          transition: theme.transitions.create(['margin', 'width'], {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.leavingScreen,
+          }),
+        }}
+      >
+        <Toolbar /> {/* This pushes the content below the AppBar */}
+        <Outlet />
       </Box>
     </Box>
   );

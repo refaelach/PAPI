@@ -1,9 +1,7 @@
 import React from 'react';
-import { Drawer, List, ListItem, ListItemText, ListItemIcon, Box, IconButton, Typography } from '@mui/material';
+import { Drawer, List, ListItem, ListItemText, ListItemIcon, Box, Typography, IconButton, Divider } from '@mui/material';
 import { Link, useLocation } from 'react-router-dom';
-import { styled } from '@mui/material/styles';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import { styled, alpha } from '@mui/material/styles';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import RecommendIcon from '@mui/icons-material/Recommend';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -11,67 +9,64 @@ import BugReportIcon from '@mui/icons-material/BugReport';
 import SettingsIcon from '@mui/icons-material/Settings';
 import WarningIcon from '@mui/icons-material/Warning';
 import SecurityIcon from '@mui/icons-material/Security';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import MenuIcon from '@mui/icons-material/Menu';
 
 const drawerWidth = 240;
+const collapsedDrawerWidth = 60;
 
-const StyledDrawer = styled(Drawer, { shouldForwardProp: (prop) => prop !== 'open' })(
-  ({ theme, open }) => ({
-    width: drawerWidth,
-    flexShrink: 0,
-    whiteSpace: 'nowrap',
+const StyledDrawer = styled(Drawer)(({ theme, open }) => ({
+  width: open ? drawerWidth : collapsedDrawerWidth,
+  flexShrink: 0,
+  '& .MuiDrawer-paper': {
+    width: open ? drawerWidth : collapsedDrawerWidth,
     boxSizing: 'border-box',
-    ...(open && {
-      ...openedMixin(theme),
-      '& .MuiDrawer-paper': openedMixin(theme),
+    backgroundColor: theme.palette.background.paper,
+    borderRight: `1px solid ${theme.palette.divider}`,
+    transition: theme.transitions.create('width', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
     }),
-    ...(!open && {
-      ...closedMixin(theme),
-      '& .MuiDrawer-paper': closedMixin(theme),
-    }),
-  }),
-);
-
-const openedMixin = (theme) => ({
-  width: drawerWidth,
-  transition: theme.transitions.create('width', {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.enteringScreen,
-  }),
-  overflowX: 'hidden',
-});
-
-const closedMixin = (theme) => ({
-  transition: theme.transitions.create('width', {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen,
-  }),
-  overflowX: 'hidden',
-  width: `calc(${theme.spacing(7)} + 1px)`,
-  [theme.breakpoints.up('sm')]: {
-    width: `calc(${theme.spacing(8)} + 1px)`,
   },
-});
+}));
 
-const DrawerHeader = styled('div')(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'flex-end',
-  padding: theme.spacing(0, 1),
-  ...theme.mixins.toolbar,
+const StyledListItem = styled(ListItem)(({ theme, active }) => ({
+  borderRadius: theme.shape.borderRadius,
+  margin: theme.spacing(0.5, 1),
+  '&:hover': {
+    backgroundColor: alpha(theme.palette.primary.main, 0.08),
+  },
+  ...(active === 'true' && {
+    backgroundColor: alpha(theme.palette.primary.main, 0.12),
+    '&:hover': {
+      backgroundColor: alpha(theme.palette.primary.main, 0.16),
+    },
+  }),
+  '& .MuiListItemIcon-root': {
+    color: active === 'true' ? theme.palette.primary.main : theme.palette.text.secondary,
+    minWidth: 40,
+  },
+  '& .MuiListItemText-primary': {
+    fontWeight: active === 'true' ? 600 : 400,
+    color: active === 'true' ? theme.palette.primary.main : theme.palette.text.primary,
+  },
 }));
 
 const SidePanel = ({ open, toggleDrawer }) => {
   const location = useLocation();
 
-  const getPanelTitle = () => {
-    if (location.pathname.startsWith('/attack-surface')) {
-      return 'Attack Surface';
-    } else if (location.pathname.startsWith('/risk-posture')) {
-      return 'Risk Posture';
-    } else if (location.pathname.startsWith('/rt-protection')) {
-      return 'RT Protection';
+  console.log('SidePanel rendered. Open state:', open);
+
+  const handleToggle = () => {
+    console.log('Toggle function called. Current open state:', open);
+    toggleDrawer();
+  };
+
+  const handleItemClick = (event) => {
+    if (!open) {
+      event.preventDefault();
+      toggleDrawer();
     }
-    return 'Navigation';
   };
 
   const getMenuItems = () => {
@@ -98,30 +93,54 @@ const SidePanel = ({ open, toggleDrawer }) => {
 
   const menuItems = getMenuItems();
 
+  if (menuItems.length === 0) {
+    return null;
+  }
+
   return (
-    <StyledDrawer variant="permanent" open={open}>
-      <DrawerHeader>
+    <StyledDrawer 
+      variant="permanent" 
+      anchor="left" 
+      open={open}
+      sx={{
+        '& .MuiDrawer-paper': {
+          zIndex: (theme) => theme.zIndex.drawer + 2,
+        },
+      }}
+    >
+      <Box sx={{ 
+        p: 2, 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'space-between',
+        position: 'relative',
+        minHeight: 64,
+      }}>
         {open && (
-          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1, marginLeft: 2 }}>
-            {getPanelTitle()}
+          <Typography variant="h6" color="textSecondary" noWrap>
+            {location.pathname.split('/')[1].split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
           </Typography>
         )}
-        <IconButton onClick={toggleDrawer}>
-          {open ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+        <IconButton onClick={handleToggle}>
+          {open ? <ChevronLeftIcon /> : <MenuIcon />}
         </IconButton>
-      </DrawerHeader>
+      </Box>
+      <Divider />
       <List>
-        {menuItems.map((item) => (
-          <ListItem
-            button
-            key={item.text}
-            component={Link}
-            to={item.link}
-            selected={location.pathname === item.link}
-          >
-            <ListItemIcon sx={{ color: 'white' }}>{item.icon}</ListItemIcon>
-            <ListItemText primary={item.text} sx={{ color: 'white' }} />
-          </ListItem>
+        {menuItems.map((item, index) => (
+          <React.Fragment key={item.text}>
+            <StyledListItem
+              button
+              component={Link}
+              to={item.link}
+              active={location.pathname === item.link ? 'true' : 'false'}
+              onClick={handleItemClick}
+            >
+              <ListItemIcon>{item.icon}</ListItemIcon>
+              {open && <ListItemText primary={item.text} />}
+            </StyledListItem>
+            {index < menuItems.length - 1 && <Divider variant="middle" />}
+          </React.Fragment>
         ))}
       </List>
     </StyledDrawer>

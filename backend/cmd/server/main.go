@@ -1,15 +1,15 @@
+//papi/backend/cmd/server/main.go:
 package main
 
 import (
-    "fmt"
+    "log"
     "net/http"
+
+    "github.com/refaelach/PAPI/internal/api"
 )
 
 func main() {
-    http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-        fmt.Fprintf(w, "Hello, World!")
-    })
-
-    fmt.Println("Server starting on port 8080...")
-    http.ListenAndServe(":8080", nil)
+    http.HandleFunc("/hello", api.HelloHandler)
+    log.Println("Server starting on :8080")
+    log.Fatal(http.ListenAndServe(":8080", nil))
 }

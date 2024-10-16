@@ -6,7 +6,7 @@ const Header = () => {
       <h1>Welcome to PAPI</h1>
       <nav>
         <ul style={{listStyle: 'none', padding: 0}}>
-          <li style={{display: 'inline', marginRight: '1rem'}}><a href="/">Home</a></li>
+          <li style={{display: 'inline', marginRight: '1rem'}}><a href="/">Home-devlopment-staging</a></li>
           <li style={{display: 'inline', marginRight: '1rem'}}><a href="/about">About</a></li>
         </ul>
       </nav>

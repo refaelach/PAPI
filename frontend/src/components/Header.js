@@ -1,15 +1,31 @@
 import React from 'react';
 import { styled } from '@mui/material/styles';
-import { AppBar, Toolbar, Typography, Button, IconButton, Box } from '@mui/material';
+import { AppBar, Toolbar, Typography, Button, IconButton, Box, useTheme } from '@mui/material';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import SettingsIcon from '@mui/icons-material/Settings';
 import ExtensionIcon from '@mui/icons-material/Extension';
+import MenuIcon from '@mui/icons-material/Menu';
 import { Link, useLocation } from 'react-router-dom';
+import Brightness4Icon from '@mui/icons-material/Brightness4';
+import Brightness7Icon from '@mui/icons-material/Brightness7';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 
-const StyledToolbar = styled(Toolbar)(({ theme }) => ({
+const StyledToolbar = styled(Toolbar)(({ theme, showSidebar, sidebarOpen }) => ({
   display: 'flex',
   justifyContent: 'space-between',
   padding: theme.spacing(0, 3),
+  transition: theme.transitions.create(['margin', 'width'], {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  ...(showSidebar && {
+    width: `calc(100% - ${sidebarOpen ? 240 : theme.spacing(7)}px)`,
+    marginLeft: sidebarOpen ? 240 : theme.spacing(7),
+    transition: theme.transitions.create(['margin', 'width'], {
+      easing: theme.transitions.easing.easeOut,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  }),
 }));
 
 const LogoContainer = styled(Box)(({ theme }) => ({
@@ -27,6 +43,7 @@ const MenuContainer = styled(Box)(({ theme }) => ({
 const StyledButton = styled(Button)(({ theme, active }) => ({
   margin: theme.spacing(0, 1),
   borderRadius: theme.shape.borderRadius,
+  color: theme.palette.mode === 'light' ? theme.palette.primary.main : theme.palette.common.white,
   '&:hover': {
     backgroundColor: theme.palette.action.hover,
   },
@@ -40,8 +57,14 @@ const IconsContainer = styled(Box)(({ theme }) => ({
   alignItems: 'center',
 }));
 
-const Header = ({ showSidebar, sidebarOpen, drawerWidth }) => {
+const StyledAppBar = styled(AppBar)(({ theme }) => ({
+  borderBottom: `1px solid ${theme.palette.divider}`,
+  // ... other styles
+}));
+
+const Header = ({ showSidebar, sidebarOpen, toggleSidebar, toggleTheme, mode }) => {
   const location = useLocation();
+  const theme = useTheme();
 
   return (
     <AppBar 

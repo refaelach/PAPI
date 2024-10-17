@@ -5,7 +5,8 @@ import AccountCircle from '@mui/icons-material/AccountCircle';
 import SettingsIcon from '@mui/icons-material/Settings';
 import ExtensionIcon from '@mui/icons-material/Extension';
 import { Link, useLocation } from 'react-router-dom';
-
+import Brightness4Icon from '@mui/icons-material/Brightness4';
+import Brightness7Icon from '@mui/icons-material/Brightness7';
 
 const StyledToolbar = styled(Toolbar)(({ theme, showSidebar, sidebarOpen }) => ({
   display: 'flex',
@@ -47,6 +48,7 @@ const StyledButton = styled(Button)(({ theme, active }) => ({
   ...(active === 'true' && {
     backgroundColor: theme.palette.action.selected,
   }),
+  textTransform: 'uppercase',
 }));
 
 const IconsContainer = styled(Box)(({ theme }) => ({
@@ -64,19 +66,18 @@ const Header = ({ showSidebar, sidebarOpen, toggleSidebar, toggleTheme, mode }) 
   const theme = useTheme();
 
   return (
-    <AppBar 
-      position="static" 
+    <StyledAppBar 
+      position="fixed" 
       elevation={0}
       sx={{
-        width: showSidebar ? `calc(100% - ${sidebarOpen ? drawerWidth : theme => theme.spacing(7)}px)` : '100%',
-        marginLeft: showSidebar ? (sidebarOpen ? `${drawerWidth}px` : theme => theme.spacing(7)) : 0,
-        transition: theme => theme.transitions.create(['width', 'margin'], {
+        zIndex: theme.zIndex.drawer + 1,
+        transition: theme.transitions.create(['width', 'margin'], {
           easing: theme.transitions.easing.sharp,
-          duration: theme.transitions.duration.enteringScreen,
+          duration: theme.transitions.duration.leavingScreen,
         }),
       }}
     >
-      <StyledToolbar>
+      <StyledToolbar showSidebar={showSidebar} sidebarOpen={sidebarOpen}>
         <LogoContainer>
           <Typography variant="h6" component={Link} to="/" sx={{ textDecoration: 'none', color: 'inherit' }}>
             PAPI
@@ -86,16 +87,18 @@ const Header = ({ showSidebar, sidebarOpen, toggleSidebar, toggleTheme, mode }) 
           {['dashboard', 'attack-surface', 'risk-posture', 'rt-protection'].map((item) => (
             <StyledButton
               key={item}
-              color="inherit"
               component={Link}
               to={`/${item}`}
               active={location.pathname === `/${item}` ? 'true' : 'false'}
             >
-              {item.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+              {item.replace('-', ' ')}
             </StyledButton>
           ))}
         </MenuContainer>
         <IconsContainer>
+          <IconButton onClick={toggleTheme} color="inherit">
+            {mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
+          </IconButton>
           <IconButton color="inherit" component={Link} to="/settings">
             <SettingsIcon />
           </IconButton>
@@ -107,7 +110,7 @@ const Header = ({ showSidebar, sidebarOpen, toggleSidebar, toggleTheme, mode }) 
           </IconButton>
         </IconsContainer>
       </StyledToolbar>
-    </AppBar>
+    </StyledAppBar>
   );
 };
 
